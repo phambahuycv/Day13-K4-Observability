@@ -35,6 +35,9 @@ class RecordingLangfuseClient:
 def test_agent_links_prompt_version_to_trace_and_generation(monkeypatch) -> None:
     monkeypatch.setenv("LANGFUSE_PUBLIC_KEY", "test-public-key")
     monkeypatch.setenv("LANGFUSE_SECRET_KEY", "test-secret-key")
+    # This is a unit test with a recording client. Prevent the @observe decorators
+    # on nested RAG/LLM calls from exporting spans with these deliberately fake keys.
+    monkeypatch.setenv("LANGFUSE_TRACING_ENABLED", "False")
     monkeypatch.setenv("LANGFUSE_PROMPT_NAME", "day13-chat")
     monkeypatch.setenv("LANGFUSE_PROMPT_LABEL", "production")
     client = RecordingLangfuseClient()
