@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from structlog.contextvars import bind_contextvars, clear_contextvars
+
 from app import agent as agent_module
 
 
@@ -39,17 +41,23 @@ def test_agent_links_prompt_version_to_trace_and_generation(monkeypatch) -> None
     monkeypatch.setattr(agent_module, "get_langfuse_client", lambda: client)
 
     agent = agent_module.LabAgent()
-    agent_module.LabAgent.run.__wrapped__(
-        agent,
-        user_id="student-01",
-        feature="qa",
-        session_id="session-01",
-        message="Explain traces",
-    )
+    clear_contextvars()
+    bind_contextvars(correlation_id="req-trace001")
+    try:
+        agent_module.LabAgent.run.__wrapped__(
+            agent,
+            user_id="student-01",
+            feature="qa",
+            session_id="session-01",
+            message="Explain traces",
+        )
+    finally:
+        clear_contextvars()
 
     trace_metadata = client.trace_updates[-1]["metadata"]
     generation_update = client.generation_updates[-1]
     assert trace_metadata == {
+        "correlation_id": "req-trace001",
         "prompt_name": "day13-chat",
         "prompt_label": "production",
         "prompt_version": "3",
