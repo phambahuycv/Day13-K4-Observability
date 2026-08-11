@@ -5,15 +5,25 @@ alerts:
     type: symptom-based
     owner: on-call-engineer
     runbook: docs/alerts.md#alert-1
+
   - name: elevated_error_rate
     severity: critical
     condition: "error_rate_pct > 5 for 3 minutes"
     type: symptom-based
     owner: on-call-engineer
     runbook: docs/alerts.md#alert-2
+
   - name: cost_budget_exceeded
     severity: warning
     condition: "daily_cost_usd > 2.5"
     type: symptom-based
     owner: team-lead
     runbook: docs/alerts.md#alert-3
+
+  # Bổ sung Alert nâng cao (Burn-Rate) để khắc phục "điểm mù"
+  - name: cost_burn_rate_spike
+    severity: critical
+    condition: "cost_usd_per_minute > 300% vs baseline over 15m"
+    type: symptom-based
+    owner: on-call-engineer
+    runbook: docs/alerts.md#alert-4
